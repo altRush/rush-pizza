@@ -1,6 +1,21 @@
 <?php
 
-include 'config/db_connect.php';
+include('config/db_connect.php');
+
+if (isset($_POST['delete'])) {
+
+  $id_to_delete = mysqli_real_escape_string($conn, $_POST['id_to_delete']);
+
+  $sql = "DELETE FROM pizzas WHERE id = $id_to_delete";
+
+  if (mysqli_query($conn, $sql)) {
+    // success
+    header('Location: index.php');
+  } else {
+    // failure
+    echo 'Query error: ' . mysqli_error($conn);
+  }
+}
 
 if (isset($_GET['id'])) {
   $id = mysqli_real_escape_string($conn, $_GET['id']);
@@ -16,10 +31,9 @@ if (isset($_GET['id'])) {
 <!DOCTYPE html>
 <html>
 
-<?php include 'templates/header.php' ?>
+<?php include('templates/header.php') ?>
 
-<h2>Details</h2>
-<div class="container center">
+<div class="container center grey-text">
   <?php if ($pizza) : ?>
 
     <h4><?php echo htmlspecialchars($pizza['title']); ?></h4>
@@ -28,13 +42,18 @@ if (isset($_GET['id'])) {
     <h5>Ingredients:</h5>
     <p><?php echo htmlspecialchars($pizza['ingredients']); ?></p>
 
+    <form action="details.php" method="POST">
+      <input type="hidden" name="id_to_delete" value="<?php echo $pizza['id']; ?>">
+      <input type="submit" name="delete" value="Delete" class="btn brand z-depth-0">
+    </form>
+
   <?php else : ?>
     <h5>No such pizza exists!</h5>
 
-  <?php endif; ?>
+  <?php endif ?>
 
 </div>
 
-<?php include 'templates/footer.php' ?>
+<?php include('templates/footer.php') ?>
 
 </html>
